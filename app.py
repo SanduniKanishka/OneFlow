@@ -47,11 +47,11 @@ def search_jokes_id(joke_id):
     local_joke = methodsObj.Methods().search_local_jokes_by_id(joke_id, local_jokes)
     remote_joke = methodsObj.Methods().search_remote_jokes_by_id(joke_id, local_jokes_ids)
     if local_joke:
-        return jsonify(local_joke.__dict__)
+        return jsonify(local_joke.__dict__), 200
     elif remote_joke:
-        return jsonify(remote_joke)
+        return jsonify(remote_joke), 200
     else:
-        return jsonify("Joke does not exist")
+        return jsonify("Joke does not exist"),404
 
 
 @app.route('/api/jokes/', methods=['POST'])
@@ -76,11 +76,11 @@ def update_joke(joke_id):
                                        joke['created_at'], datetime.now(), False)
         local_jokes.append(updated_joke)
         local_jokes_ids.append(joke_id)
-        return jsonify(updated_joke.__dict__)
+        return jsonify(updated_joke.__dict__), 200
     elif local_joke:
-        return jsonify(local_joke.__dict__)
+        return jsonify(local_joke.__dict__),200
     else:
-        return jsonify({'message': '404 not found'}), 404
+        return jsonify({'message': 'Joke not found'}), 404
 
 
 def update_local_joke(joke_id, new_value):
