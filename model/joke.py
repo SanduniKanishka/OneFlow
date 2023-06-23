@@ -3,7 +3,7 @@ class Joke:
 
     def __init__(self,id, value, created_at, updated_at, removed):
 
-        if id == "":
+        if id == "new":
             self.id = Joke.joke_id
         else:
             self.id = id

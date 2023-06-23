@@ -8,7 +8,7 @@ class Methods:
         local_jokes_results = []
         for joke in local_jokes:
             if query.lower() in joke.get_value().lower() and not joke.get_removed():
-                local_jokes_results.append(joke.get_value())
+                local_jokes_results.append(joke.__dict__)
         return local_jokes_results
 
     def search_remote_jokes(self, query, local_jokes_ids):
@@ -22,7 +22,7 @@ class Methods:
                 remote_jokes_results = response.json().get("result")
                 for joke in remote_jokes_results:
                     if joke.get("id") not in local_jokes_ids:
-                        result.append(joke.get("value"))
+                        result.append(joke)
                 return result
 
             else:

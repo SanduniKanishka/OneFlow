@@ -11,8 +11,8 @@ app = Flask(__name__)
 local_jokes_ids = []
 key_id = 0
 
-local_jokes = [joke_model.Joke("", 'Joke 1', '2023-06-22 03:22:28', '2023-06-23 13:42:28', False),
-               joke_model.Joke("", 'Joke 2', datetime.now(), datetime.now(), False)]
+local_jokes = [joke_model.Joke("new", 'Joke 1', '2023-06-22 03:22:28', '2023-06-23 13:42:28', False),
+               joke_model.Joke("new", 'Joke 2', datetime.now(), datetime.now(), False)]
 
 
 @app.route('/jokes/', methods=['GET'])
@@ -23,9 +23,9 @@ def search_jokes():
     remote_jokes_arr = methodsObj.Methods().search_remote_jokes(query, local_jokes_ids)
     if local_jokes_arr:
         jokes.append(local_jokes_arr)
-    elif remote_jokes_arr:
+    if remote_jokes_arr:
         jokes.append(remote_jokes_arr)
-    else:
+    if jokes == []:
         return jsonify("Joke does not exist"), 404
 
     return jsonify(jokes)
@@ -44,15 +44,12 @@ def get_all_local_jokes():
 
 @app.route('/api/jokes/<string:joke_id>', methods=['GET'])
 def search_jokes_id(joke_id):
-    jokes = []
     local_joke = methodsObj.Methods().search_local_jokes_by_id(joke_id, local_jokes)
     remote_joke = methodsObj.Methods().search_remote_jokes_by_id(joke_id, local_jokes_ids)
     if local_joke:
-        jokes.append(local_joke)
         return jsonify(local_joke.__dict__)
     elif remote_joke:
-        jokes.append(remote_joke)
-        return jsonify(jokes)
+        return jsonify(remote_joke)
     else:
         return jsonify("Joke does not exist")
 
@@ -61,7 +58,7 @@ def search_jokes_id(joke_id):
 def create_joke(self=None):
     data = request.get_json()
     value = data.get('value')
-    new_joke = joke_model.Joke("", value, datetime.now(), datetime.now(), False)
+    new_joke = joke_model.Joke("new", value, datetime.now(), datetime.now(), False)
     local_jokes.append(new_joke)
     local_jokes_ids.append(new_joke.get_id())
     return jsonify(new_joke.__dict__), 201
@@ -88,7 +85,7 @@ def update_joke(joke_id):
 
 def update_local_joke(joke_id, new_value):
     for joke in local_jokes:
-        if str(joke.get_id()) == joke_id:
+        if str(joke.get_id()) == joke_id and not joke.get_removed():
             joke.set_value(new_value)
             return joke
 
@@ -122,7 +119,7 @@ def create_image_joke(self=None):
     data = request.get_json()
     value = data.get('value')
     url = data.get('url')
-    image_joke = joke_model.ImageJoke("", value, datetime.now(), datetime.now(), False, url)
+    image_joke = joke_model.ImageJoke("new", value, datetime.now(), datetime.now(), False, url)
     local_jokes.append(image_joke)
     local_jokes_ids.append(image_joke.get_id())
     return jsonify(image_joke.__dict__), 201
@@ -133,7 +130,7 @@ def swagger_docs():
     swag = {
         'swagger': '2.0',
         'info': {
-            'title': 'Your API Documentation Title',
+            'title': 'Flask API Documentation',
             'version': '1.0',
         },
         'paths': {
@@ -365,7 +362,7 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': "Your API Documentation"  # Display name for the API
+        'app_name': "Flask API Documentation"  # Display name for the API
     }
 )
 
